@@ -144,45 +144,45 @@ module.exports = (robot) ->
     jstips.length - (jstipsToKeep.length)
 
   # Check for jstips that need to be fired, once a minute
-  # Monday to Friday.
-  new cronJob('1 * * * * 1-5', checkJstips, null, true)
+  # Monday to Sunday.
+  new cronJob('1 * * * * 1-7', checkJstips, null, true)
 
   robot.respond /delete all jstips for (.+)$/i, (msg) ->
     room = msg.match[1]
     jstipsCleared = clearAlljstipsForRoom(room)
-    msg.send 'Deleted ' + jstipsCleared + ' jstips for ' + room
+    msg.send 'Deleted ' + jstipsCleared + ' .js tips for ' + room
 
   robot.respond /delete all jstips$/i, (msg) ->
     jstipsCleared = clearAllJstipsForRoom(findRoom(msg))
-    msg.send 'Deleted ' + jstipsCleared + ' jstip' + (if jstipsCleared == 1 then '' else 's') + '. No more jstips for you.'
+    msg.send 'Deleted ' + jstipsCleared + ' .js tip' + (if jstipsCleared == 1 then '' else 's') + '. No more .js tips for you.'
     return
   robot.respond /delete ([0-5]?[0-9]:[0-5]?[0-9]) jstip/i, (msg) ->
     time = msg.match[1]
     jstipsCleared = clearSpecificJstipForRoom(findRoom(msg), time)
     if jstipsCleared == 0
-      msg.send 'Nice try. You don\'t even have a jstip at ' + time
+      msg.send 'Nice try. You don\'t even have a .js tip scheduled at ' + time
     else
-      msg.send 'Deleted your ' + time + ' jstip.'
+      msg.send 'Deleted your ' + time + ' .js tip.'
     return
   robot.respond /create jstip ((?:[01]?[0-9]|2[0-4]):[0-5]?[0-9])$/i, (msg) ->
     time = msg.match[1]
     room = findRoom(msg)
     saveJstip room, time
-    msg.send 'Ok, from now on I\'ll remind this room to do a jstip every weekday at ' + time
+    msg.send 'Ok, from now on I\'ll provide this room a .js tip every day at ' + time
     return
   robot.respond /create jstip ((?:[01]?[0-9]|2[0-4]):[0-5]?[0-9]) UTC([+-]([0-9]|1[0-3]))$/i, (msg) ->
     time = msg.match[1]
     utc = msg.match[2]
     room = findRoom(msg)
     saveJstip room, time, utc
-    msg.send 'Ok, from now on I\'ll remind this room to do a jstip every weekday at ' + time + ' UTC' + utc
+    msg.send 'Ok, from now on I\'ll provide this room a .js tip every day at ' + time + ' UTC' + utc
     return
   robot.respond /list jstips$/i, (msg) ->
     jstips = getJstipsForRoom(findRoom(msg))
     if jstips.length == 0
-      msg.send 'Well this is awkward. You haven\'t got any jstips set :-/'
+      msg.send 'Well this is awkward. You haven\'t got any .js tips set :-/'
     else
-      jstipsText = [ 'Here\'s your jstips:' ].concat(_.map(jstips, (jstip) ->
+      jstipsText = [ 'Here\'s your .js tips:' ].concat(_.map(jstips, (jstip) ->
         if jstip.utc
           jstip.time + ' UTC' + jstip.utc
         else
@@ -195,22 +195,22 @@ module.exports = (robot) ->
     if jstips.length == 0
       msg.send 'No, because there aren\'t any.'
     else
-      jstipsText = [ 'Here\'s the jstips for every room:' ].concat(_.map(jstips, (jstip) ->
+      jstipsText = [ 'Here\'s the .js tips for every room:' ].concat(_.map(jstips, (jstip) ->
         'Room: ' + jstip.room + ', Time: ' + jstip.time
       ))
       msg.send jstipsText.join('\n')
     return
   robot.respond /jstip help/i, (msg) ->
     message = []
-    message.push 'I can remind you to do your daily jstip!'
-    message.push 'Use me to create a jstip, and then I\'ll post in this room every weekday at the time you specify. Here\'s how:'
+    message.push 'I can provide you with a daily .js tip!'
+    message.push 'Use me to create a .js tip event, and then I\'ll post in this room every day at the time you specify. Here\'s how:'
     message.push ''
-    message.push robot.name + ' create jstip hh:mm - I\'ll remind you to jstip in this room at hh:mm every weekday.'
-    message.push robot.name + ' create jstip hh:mm UTC+2 - I\'ll remind you to jstip in this room at hh:mm every weekday.'
-    message.push robot.name + ' list jstips - See all jstips for this room.'
-    message.push robot.name + ' list jstips in every room - Be nosey and see when other rooms have their jstip.'
-    message.push robot.name + ' delete hh:mm jstip - If you have a jstip at hh:mm, I\'ll delete it.'
-    message.push robot.name + ' delete all jstips - Deletes all jstips for this room.'
+    message.push robot.name + ' create jstip hh:mm - I\'ll post a .js tip in this room at hh:mm every day.'
+    message.push robot.name + ' create jstip hh:mm UTC+2 - I\'ll post a .js tip in this room at hh:mm every day.'
+    message.push robot.name + ' list jstips - See all .js tips scheduled for this room.'
+    message.push robot.name + ' list jstips in every room - Be nosey and see when other rooms have their .js tips.'
+    message.push robot.name + ' delete hh:mm jstip - If you have a .js tip scheduled at hh:mm, I\'ll delete it.'
+    message.push robot.name + ' delete all jstips - Deletes all .js tips for this room.'
     msg.send message.join('\n')
     return
   return
