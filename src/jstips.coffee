@@ -86,22 +86,18 @@ module.exports = (robot) ->
   # Fires the jstip message.
 
   doJstip = (room) ->
-    robot.http("https://github.com/loverajoel/jstips/blob/master/README.md")
+    robot.http("http://www.jstips.co/")
 	        .get() (err, res, body) ->
 	      # pretend there's error checking code here
 	          if res.statusCode isnt 200
               message = "Request came back" + res.statusCode
               robot.messageRoom room, message
               return
-	          $ = cheerio.load(body);
-	          $tipHeader = $('h1:contains(Tips list)').next();
-	          tip = '\n'+ $tipHeader.text() + '\n';
-	          $tipPointer = $tipHeader.next();
-	          while !$tipPointer.is 'h2'
-              tip = tip + $tipPointer.text() + '\n';
-              $tipPointer = $tipPointer.next()
-            message = tip
-            robot.messageRoom room, message
+            $ = cheerio.load(body);
+            $tipHeader = $('.posts');
+            tip = $tipHeader.find('p').first().text() + '\n'
+            tip = tip + "http://www.jstips.co" + $tipHeader.find('a').attr('href') + '\n';
+            robot.messageRoom room, tip
             return
 
   # Finds the room for most adaptors
